@@ -1,5 +1,7 @@
 import { NextAuthOptions } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import bcrypt from 'bcryptjs'
 import { connectDB } from './mongodb'
 import { User } from '@/models/User'
 
@@ -9,27 +11,54 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
+
+    CredentialsProvider({
+      name: 'credentials',
+      credentials: {
+        email:    { label: 'Email',    type: 'email' },
+        password: { label: 'Password', type: 'password' },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) return null
+
+        await connectDB()
+        const user = await User.findOne({ email: credentials.email.toLowerCase() })
+        if (!user || !user.password) return null
+
+        const valid = await bcrypt.compare(credentials.password, user.password)
+        if (!valid) return null
+
+        return {
+          id:    user._id.toString(),
+          email: user.email,
+          name:  user.name,
+          image: user.image ?? null,
+        }
+      },
+    }),
   ],
 
   session: { strategy: 'jwt' },
 
   pages: {
     signIn: '/login',
-    error: '/login',
+    error:  '/login',
   },
 
   callbacks: {
     async signIn({ user, account }) {
+      // Credentials sign-ins are handled fully in authorize() above
+      if (account?.provider === 'credentials') return true
+
       if (account?.provider !== 'google') return false
       try {
         await connectDB()
-        // Upsert — create on first sign-in, update name/photo on later ones
         await User.findOneAndUpdate(
           { email: user.email!.toLowerCase() },
           {
             $set: {
-              name: user.name ?? '',
-              image: user.image ?? '',
+              name:     user.name ?? '',
+              image:    user.image ?? '',
               googleId: account.providerAccountId,
             },
           },
@@ -42,8 +71,13 @@ export const authOptions: NextAuthOptions = {
       }
     },
 
-    async jwt({ token, account }) {
-      // account is only present on the first sign-in — use it to fetch userId once
+    async jwt({ token, account, user }) {
+      // On credentials sign-in, user object has the id from authorize()
+      if (account?.provider === 'credentials' && user) {
+        token.userId = (user as { id: string }).id
+        return token
+      }
+      // On first Google sign-in, fetch userId from DB
       if (account) {
         await connectDB()
         const dbUser = await User.findOne({ email: token.email!.toLowerCase() })

@@ -11,7 +11,7 @@ import { useTimer } from '@/hooks/useTimer'
 import { useInterviewSession } from '@/hooks/useInterviewSession'
 import { Square, PhoneOff } from 'lucide-react'
 
-const SILENCE_TIMEOUT_MS = 12000 // 12 seconds of mic-open time before auto-submit
+const SILENCE_TIMEOUT_MS = 150000 // 150 seconds of mic-open time before auto-submit
 
 export default function InterviewPage() {
   const router = useRouter()
@@ -36,6 +36,8 @@ export default function InterviewPage() {
   const silenceTimerRef = useRef<NodeJS.Timeout | null>(null)
   // Prevent double-submission if both the silence timer and onEnd callback fire
   const isSubmittingRef = useRef(false)
+  // Prevent handleSendMessage from running after the user clicks End Interview
+  const isEndingRef = useRef(false)
   // Mirror transcript/interimTranscript so handleSendMessage always reads the latest value
   // (avoids stale closure inside the silence timer callback)
   const transcriptRef = useRef('')
@@ -112,7 +114,7 @@ export default function InterviewPage() {
 
   // ── Core: send transcript to API ──────────────────────────────────────────
   const handleSendMessage = async () => {
-    if (isSubmittingRef.current) return
+    if (isSubmittingRef.current || isEndingRef.current) return
     isSubmittingRef.current = true
 
     clearSilenceTimer()
@@ -159,6 +161,7 @@ export default function InterviewPage() {
   }
 
   const handleEndInterview = async () => {
+    isEndingRef.current = true  // block handleSendMessage from running
     clearSilenceTimer()
     stopSpeaking()
     stopListening()
@@ -270,8 +273,7 @@ export default function InterviewPage() {
 
               {isListening && (
                 <p className="text-xs text-slate-500 mt-3">
-                  Mic will auto-submit after{' '}
-                  {Math.round(SILENCE_TIMEOUT_MS / 1000)}s — or press Send when done
+                  Mic auto-submits after {Math.round(SILENCE_TIMEOUT_MS / 1000)}s — or press Send when ready
                 </p>
               )}
             </div>

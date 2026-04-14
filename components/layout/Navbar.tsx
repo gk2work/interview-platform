@@ -66,15 +66,16 @@ export function Navbar() {
                   className="flex items-center gap-1.5 ml-1 pl-2 pr-1 py-1 rounded-lg hover:bg-white/5 transition-colors"
                 >
                   {session.user?.image ? (
-                    <Image
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
                       src={session.user.image}
                       alt={session.user.name ?? ''}
                       width={32}
                       height={32}
-                      className="rounded-full ring-2 ring-blue/30"
+                      className="w-8 h-8 rounded-full ring-2 ring-blue/30 object-cover flex-shrink-0"
                     />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue to-emerald flex items-center justify-center text-sm font-bold">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue to-emerald flex items-center justify-center text-sm font-bold flex-shrink-0">
                       {session.user?.name?.[0] ?? '?'}
                     </div>
                   )}
