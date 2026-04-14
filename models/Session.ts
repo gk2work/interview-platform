@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose'
 
 export interface SessionDocument extends Document {
+  userId?: mongoose.Types.ObjectId
   candidateName?: string
   cvFileName: string
   cvFilePath: string
@@ -16,6 +17,7 @@ export interface SessionDocument extends Document {
 
 const sessionSchema = new Schema<SessionDocument>(
   {
+    userId: { type: Schema.Types.ObjectId, ref: 'User' }, // optional for backwards-compat
     candidateName: { type: String },
     cvFileName: { type: String, required: true },
     cvFilePath: { type: String, required: true },

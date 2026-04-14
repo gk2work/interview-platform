@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { SessionProvider } from '@/components/layout/SessionProvider'
 
 export const metadata: Metadata = {
   title: 'FormalMock — AI Voice Interview Practice',
   description:
-    'Practice job interviews with FormalMock\'s AI-powered voice interviewer. Get detailed feedback, scores, and personalised coaching to land your dream role.',
+    "Practice job interviews with FormalMock's AI-powered voice interviewer. Get detailed feedback, scores, and personalised coaching to land your dream role.",
   keywords: ['mock interview', 'AI interview', 'interview practice', 'job interview', 'career'],
   authors: [{ name: 'FormalMock' }],
   openGraph: {
@@ -22,9 +23,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body className="bg-navy text-white">
-        <div className="min-h-screen flex flex-col">
-          <main className="flex-1">{children}</main>
-        </div>
+        <SessionProvider>
+          <div className="min-h-screen flex flex-col">
+            <main className="flex-1">{children}</main>
+          </div>
+        </SessionProvider>
       </body>
     </html>
   )

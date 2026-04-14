@@ -1,3 +1,5 @@
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { connectDB } from '@/lib/mongodb'
 import { Session } from '@/models/Session'
 import { Message } from '@/models/Message'
@@ -6,6 +8,11 @@ import { chatCompletion } from '@/lib/openai'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
+  const authSession = await getServerSession(authOptions)
+  if (!authSession?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     await connectDB()
 
@@ -13,29 +20,25 @@ export async function POST(request: NextRequest) {
     const { cvFilePath, cvParsedText, cvStructuredData, interviewConfig } = body
 
     if (!cvParsedText || !interviewConfig) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // Build system prompt
     const systemPrompt = buildSystemPrompt({
       _id: '',
-      cvFileName: cvFilePath.split('/').pop() || 'resume.pdf',
-      cvFilePath,
+      cvFileName: cvFilePath?.split('/').pop() || 'resume.pdf',
+      cvFilePath: cvFilePath || '',
       cvParsedText,
       cvStructuredData,
       interviewConfig,
       status: 'in-progress',
-      systemPrompt: '', // Will be set below
+      systemPrompt: '',
       totalTurns: 0,
     })
 
-    // Create session
     const session = new Session({
-      cvFileName: cvFilePath.split('/').pop() || 'resume.pdf',
-      cvFilePath,
+      userId: authSession.user.id,
+      cvFileName: cvFilePath?.split('/').pop() || 'resume.pdf',
+      cvFilePath: cvFilePath || '',
       cvParsedText,
       cvStructuredData,
       interviewConfig,
@@ -47,7 +50,6 @@ export async function POST(request: NextRequest) {
 
     await session.save()
 
-    // Create system message
     await Message.create({
       sessionId: session._id,
       role: 'system',
@@ -55,10 +57,8 @@ export async function POST(request: NextRequest) {
       turnNumber: 0,
     })
 
-    // Generate first interviewer message (greeting)
     const greeting = await chatCompletion([], systemPrompt)
 
-    // Save interviewer message
     await Message.create({
       sessionId: session._id,
       role: 'interviewer',
@@ -66,33 +66,29 @@ export async function POST(request: NextRequest) {
       turnNumber: 1,
     })
 
-    return NextResponse.json({
-      sessionId: session._id,
-      firstMessage: greeting,
-    })
+    return NextResponse.json({ sessionId: session._id, firstMessage: greeting })
   } catch (error) {
     console.error('Error creating session:', error)
-    return NextResponse.json(
-      { error: 'Failed to create session' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to create session' }, { status: 500 })
   }
 }
 
 export async function GET() {
+  const authSession = await getServerSession(authOptions)
+  if (!authSession?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     await connectDB()
 
-    const sessions = await Session.find()
+    const sessions = await Session.find({ userId: authSession.user.id })
       .sort({ createdAt: -1 })
       .limit(50)
 
     return NextResponse.json(sessions)
   } catch (error) {
     console.error('Error fetching sessions:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch sessions' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to fetch sessions' }, { status: 500 })
   }
 }

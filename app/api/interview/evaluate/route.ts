@@ -1,3 +1,5 @@
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { connectDB } from '@/lib/mongodb'
 import { Session } from '@/models/Session'
 import { Message } from '@/models/Message'
@@ -6,6 +8,11 @@ import { buildEvaluation } from '@/lib/evaluator'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
+  const authSession = await getServerSession(authOptions)
+  if (!authSession?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     await connectDB()
 
@@ -18,20 +25,19 @@ export async function POST(request: NextRequest) {
 
     // Return immediately if already evaluated — fast path
     const existing = await Evaluation.findOne({ sessionId })
-    if (existing) {
-      return NextResponse.json(existing)
-    }
+    if (existing) return NextResponse.json(existing)
 
-    // Fetch session
     const session = await Session.findById(sessionId)
     if (!session) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 })
     }
 
-    // Fetch messages
+    if (session.userId && session.userId.toString() !== authSession.user.id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     const messages = await Message.find({ sessionId }).sort({ createdAt: 1 })
 
-    // Generate evaluation via GPT
     const evaluationData = await buildEvaluation(
       session.toObject(),
       messages.map(m => m.toObject())
@@ -39,14 +45,10 @@ export async function POST(request: NextRequest) {
 
     try {
       const savedEvaluation = await Evaluation.create(evaluationData)
-
-      // Mark session as evaluated
       await Session.findByIdAndUpdate(sessionId, { status: 'evaluated' })
-
       return NextResponse.json(savedEvaluation)
     } catch (createError: any) {
-      // E11000 = duplicate key: another concurrent request already inserted the evaluation.
-      // Return the existing document instead of crashing.
+      // E11000 — concurrent request already inserted; return existing
       if (createError?.code === 11000) {
         const race = await Evaluation.findOne({ sessionId })
         if (race) return NextResponse.json(race)
