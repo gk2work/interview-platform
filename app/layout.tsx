@@ -2,8 +2,16 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'AI Voice Interview Platform',
-  description: 'Practice interviews with AI-powered voice conversations',
+  title: 'FormalMock — AI Voice Interview Practice',
+  description:
+    'Practice job interviews with FormalMock\'s AI-powered voice interviewer. Get detailed feedback, scores, and personalised coaching to land your dream role.',
+  keywords: ['mock interview', 'AI interview', 'interview practice', 'job interview', 'career'],
+  authors: [{ name: 'FormalMock' }],
+  openGraph: {
+    title: 'FormalMock — AI Voice Interview Practice',
+    description: 'Practice interviews with AI. Get hired.',
+    type: 'website',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

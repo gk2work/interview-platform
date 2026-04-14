@@ -207,15 +207,20 @@ export default function InterviewPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-heading font-bold">
-              {session?.interviewConfig.designation}
-            </h1>
-            <p className="text-slate-400">{session?.interviewConfig.company}</p>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue to-emerald flex items-center justify-center flex-shrink-0">
+              <span className="text-white font-heading font-bold text-xs">FM</span>
+            </div>
+            <div>
+              <h1 className="text-xl font-heading font-bold leading-tight">
+                {session?.interviewConfig.designation}
+              </h1>
+              <p className="text-slate-400 text-sm">{session?.interviewConfig.company}</p>
+            </div>
           </div>
           <div className="text-right">
-            <p className="text-sm text-slate-400">Time</p>
-            <p className="text-2xl font-heading font-bold">{formatTime()}</p>
+            <p className="text-xs text-slate-500 uppercase tracking-wide mb-0.5">Elapsed</p>
+            <p className="text-2xl font-heading font-bold tabular-nums">{formatTime()}</p>
           </div>
         </div>
 

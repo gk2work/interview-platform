@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { getRecommendationColor } from '@/lib/constants'
 import { Calendar, Zap } from 'lucide-react'
+import { Navbar } from '@/components/layout/Navbar'
+import { Footer } from '@/components/layout/Footer'
 
 interface Session {
   _id: string
@@ -56,7 +58,9 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-navy py-12 px-4">
+    <div className="flex flex-col min-h-screen bg-navy">
+      <Navbar />
+      <div className="flex-1 py-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-12">
@@ -137,6 +141,8 @@ export default function HistoryPage() {
           </div>
         )}
       </div>
+      </div>
+      <Footer />
     </div>
   )
 }

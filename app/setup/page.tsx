@@ -9,6 +9,8 @@ import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
 import { FileUpload } from '@/components/ui/FileUpload'
 import { INTERVIEW_TYPES, DIFFICULTY_LEVELS } from '@/lib/constants'
+import { Navbar } from '@/components/layout/Navbar'
+import { Footer } from '@/components/layout/Footer'
 
 // Stages shown to the user during CV upload (each lasts ~2s before cycling to the next)
 const CV_UPLOAD_STAGES = [
@@ -137,12 +139,14 @@ export default function SetupPage() {
   const currentLoadingText = isUploadingCV ? cvUploadStage : isStartingInterview ? sessionStage : ''
 
   return (
-    <div className="min-h-screen bg-navy py-12 px-4">
+    <div className="flex flex-col min-h-screen bg-navy">
+      <Navbar />
+      <div className="flex-1 py-12 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-heading font-bold mb-3">Setup Your Interview</h1>
-          <p className="text-slate-300">Step {step} of 2</p>
+          <h1 className="text-4xl font-heading font-bold mb-3">Set Up Your Interview</h1>
+          <p className="text-slate-400">Step {step} of 2 — configure Meriam for your target role</p>
         </div>
 
         {/* Step Indicator */}
@@ -348,6 +352,8 @@ export default function SetupPage() {
           </Card>
         )}
       </div>
+      </div>
+      <Footer />
     </div>
   )
 }

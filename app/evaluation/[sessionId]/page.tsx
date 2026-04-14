@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/Button'
 import { Progress } from '@/components/ui/Progress'
 import { getRecommendationColor } from '@/lib/constants'
 import { BarChart3, ArrowLeft } from 'lucide-react'
+import { Navbar } from '@/components/layout/Navbar'
+import { Footer } from '@/components/layout/Footer'
 
 interface IEvaluation {
   _id: string
@@ -113,27 +115,35 @@ export default function EvaluationPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-navy flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-blue border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-300 mb-2">Generating your evaluation…</p>
-          <p className="text-slate-500 text-sm">This usually takes 10–20 seconds</p>
+      <div className="flex flex-col min-h-screen bg-navy">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-blue border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-slate-300 mb-2">Generating your evaluation…</p>
+            <p className="text-slate-500 text-sm">This usually takes 10–20 seconds</p>
+          </div>
         </div>
+        <Footer />
       </div>
     )
   }
 
   if (error || !evaluation) {
     return (
-      <div className="min-h-screen bg-navy py-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          <Card className="text-center py-12 bg-rose/10 border-rose/50">
-            <p className="text-rose mb-6">{error || 'Evaluation not found'}</p>
-            <Button variant="primary" onClick={() => router.push('/setup')}>
-              Start New Interview
-            </Button>
-          </Card>
+      <div className="flex flex-col min-h-screen bg-navy">
+        <Navbar />
+        <div className="flex-1 py-12 px-4">
+          <div className="max-w-4xl mx-auto">
+            <Card className="text-center py-12 bg-rose/10 border-rose/50">
+              <p className="text-rose mb-6">{error || 'Evaluation not found'}</p>
+              <Button variant="primary" onClick={() => router.push('/setup')}>
+                Start New Interview
+              </Button>
+            </Card>
+          </div>
         </div>
+        <Footer />
       </div>
     )
   }
@@ -146,7 +156,9 @@ export default function EvaluationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-navy py-12 px-4">
+    <div className="flex flex-col min-h-screen bg-navy">
+      <Navbar />
+      <div className="flex-1 py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <Button
           variant="ghost"
@@ -258,6 +270,8 @@ export default function EvaluationPage() {
           </Button>
         </div>
       </div>
+      </div>
+      <Footer />
     </div>
   )
 }
