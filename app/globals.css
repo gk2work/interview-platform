@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-navy text-white font-sans;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-blue rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-blue/80;
+}
+
+/* Animations */
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes wave {
+  0%, 100% {
+    height: 30%;
+  }
+  50% {
+    height: 100%;
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+/* Button styles */
+.btn {
+  @apply px-6 py-3 rounded-lg font-semibold transition-all duration-200 cursor-pointer;
+}
+
+.btn-primary {
+  @apply btn bg-blue text-white hover:bg-blue/90 active:scale-95;
+}
+
+.btn-secondary {
+  @apply btn bg-slate text-white hover:bg-slate/80 active:scale-95;
+}
+
+.btn-ghost {
+  @apply btn bg-transparent text-blue hover:bg-blue/10 active:bg-blue/20;
+}
+
+.btn-success {
+  @apply btn bg-emerald text-white hover:bg-emerald/90 active:scale-95;
+}
+
+.btn-danger {
+  @apply btn bg-rose text-white hover:bg-rose/90 active:scale-95;
+}
+
+/* Focus styles */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue focus:ring-offset-2 focus:ring-offset-navy;
+}
+
+/* Typography */
+h1 {
+  @apply text-4xl font-heading font-bold tracking-tight;
+}
+
+h2 {
+  @apply text-3xl font-heading font-bold tracking-tight;
+}
+
+h3 {
+  @apply text-2xl font-heading font-semibold;
+}
+
+h4 {
+  @apply text-xl font-heading font-semibold;
+}
+
+p {
+  @apply text-base leading-relaxed;
+}
+
+small {
+  @apply text-sm text-slate-300;
+}

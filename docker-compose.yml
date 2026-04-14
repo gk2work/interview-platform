@@ -1,0 +1,28 @@
+version: "3.8"
+services:
+  mongodb:
+    image: mongo:7
+    container_name: interview-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+
+  app:
+    build: .
+    container_name: interview-app
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/ai-interview
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=gpt-4o
+    depends_on:
+      - mongodb
+    volumes:
+      - ./public/uploads:/app/public/uploads
+    restart: unless-stopped
+
+volumes:
+  mongo-data:
