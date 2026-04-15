@@ -5,9 +5,6 @@ import { User } from '@/models/User'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2026-02-25.clover' })
 
-// Next.js requires raw body for Stripe signature verification
-export const config = { api: { bodyParser: false } }
-
 export async function POST(req: NextRequest) {
   const sig = req.headers.get('stripe-signature')
   if (!sig) return NextResponse.json({ error: 'Missing signature' }, { status: 400 })
