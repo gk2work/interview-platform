@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@stripe/stripe-js": "^9.2.0",
     "bcryptjs": "^3.0.3",
     "formidable": "^3.5.0",
     "framer-motion": "^11.0.0",
@@ -21,6 +22,7 @@
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "recharts": "^2.12.0",
+    "stripe": "^22.0.1",
     "tailwind-merge": "^2.3.0"
   },
   "devDependencies": {

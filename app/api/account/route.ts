@@ -25,7 +25,7 @@ export async function GET() {
     status: 'evaluated',
   })
 
-  return NextResponse.json({ user, totalSessions, evaluatedSessions })
+  return NextResponse.json({ user, totalSessions, evaluatedSessions, credits: (user as { credits?: number }).credits ?? 0 })
 }
 
 // DELETE /api/account — wipe all user data and delete account

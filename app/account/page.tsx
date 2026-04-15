@@ -7,13 +7,13 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { LogOut, Trash2, BarChart3, Mic, AlertTriangle } from 'lucide-react'
-import Image from 'next/image'
+import { LogOut, Trash2, BarChart3, Mic, AlertTriangle, Zap } from 'lucide-react'
 
 interface AccountData {
   user: { name: string; email: string; image?: string; createdAt: string }
   totalSessions: number
   evaluatedSessions: number
+  credits: number
 }
 
 export default function AccountPage() {
@@ -71,12 +71,13 @@ export default function AccountPage() {
           {/* Profile card */}
           <Card className="mb-6 flex items-center gap-5">
             {user?.image ? (
-              <Image
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
                 src={user.image}
                 alt={user.name}
                 width={64}
                 height={64}
-                className="rounded-full ring-2 ring-blue/30 flex-shrink-0"
+                className="w-16 h-16 rounded-full ring-2 ring-blue/30 flex-shrink-0 object-cover"
               />
             ) : (
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue to-emerald flex items-center justify-center text-2xl font-heading font-bold flex-shrink-0">
@@ -98,7 +99,7 @@ export default function AccountPage() {
           </Card>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-3 gap-4 mb-6">
             <Card className="text-center py-6">
               <Mic className="w-8 h-8 text-blue mx-auto mb-2" />
               <p className="text-3xl font-heading font-bold text-white">{data?.totalSessions ?? 0}</p>
@@ -109,7 +110,27 @@ export default function AccountPage() {
               <p className="text-3xl font-heading font-bold text-white">{data?.evaluatedSessions ?? 0}</p>
               <p className="text-slate-400 text-sm mt-1">Reports generated</p>
             </Card>
+            <Card className={`text-center py-6 ${data?.credits === 0 ? 'border-rose/30 bg-rose/5' : ''}`}>
+              <Zap className={`w-8 h-8 mx-auto mb-2 ${data?.credits === 0 ? 'text-rose' : 'text-blue'}`} />
+              <p className={`text-3xl font-heading font-bold ${data?.credits === 0 ? 'text-rose' : 'text-white'}`}>
+                {data?.credits ?? 0}
+              </p>
+              <p className="text-slate-400 text-sm mt-1">Credits left</p>
+            </Card>
           </div>
+
+          {/* Buy credits CTA */}
+          {(data?.credits ?? 0) === 0 && (
+            <Card className="mb-6 bg-blue/5 border-blue/20 flex items-center justify-between gap-4">
+              <div>
+                <p className="font-semibold text-white text-sm">You&apos;re out of credits</p>
+                <p className="text-slate-400 text-xs mt-0.5">Get 5 more interviews for $4.99</p>
+              </div>
+              <Button variant="primary" onClick={() => router.push('/pricing')} className="flex-shrink-0 flex items-center gap-2">
+                <Zap size={15} /> Buy Credits
+              </Button>
+            </Card>
+          )}
 
           {/* Actions */}
           <Card className="mb-6 space-y-3">

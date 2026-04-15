@@ -1,16 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
 import { useState, useRef, useEffect } from 'react'
-import { LogOut, User, History, ChevronDown } from 'lucide-react'
+import { LogOut, User, History, ChevronDown, Zap } from 'lucide-react'
 
 export function Navbar() {
   const pathname = usePathname()
   const { data: session } = useSession()
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [credits, setCredits] = useState<number | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   // Close dropdown when clicking outside
@@ -23,6 +23,15 @@ export function Navbar() {
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
+
+  // Fetch credit balance
+  useEffect(() => {
+    if (!session) return
+    fetch('/api/account')
+      .then(r => r.json())
+      .then(d => setCredits(d.credits ?? 0))
+      .catch(() => {})
+  }, [session])
 
   return (
     <nav className="sticky top-0 z-50 border-b border-white/5 bg-navy/80 backdrop-blur-md">
@@ -51,6 +60,21 @@ export function Navbar() {
               >
                 History
               </Link>
+
+              {/* Credit badge */}
+              {credits !== null && (
+                <Link
+                  href="/pricing"
+                  className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                    credits === 0
+                      ? 'bg-rose/15 text-rose border border-rose/30 hover:bg-rose/25'
+                      : 'bg-blue/10 text-blue border border-blue/20 hover:bg-blue/20'
+                  }`}
+                >
+                  <Zap size={12} />
+                  {credits} credit{credits !== 1 ? 's' : ''}
+                </Link>
+              )}
 
               <Link
                 href="/setup"
@@ -91,6 +115,11 @@ export function Navbar() {
                     <div className="px-4 py-3 border-b border-white/5">
                       <p className="text-sm font-semibold text-white truncate">{session.user?.name}</p>
                       <p className="text-xs text-slate-500 truncate">{session.user?.email}</p>
+                      {credits !== null && (
+                        <p className={`text-xs mt-1 font-medium ${credits === 0 ? 'text-rose' : 'text-blue'}`}>
+                          {credits} credit{credits !== 1 ? 's' : ''} remaining
+                        </p>
+                      )}
                     </div>
 
                     {/* Menu items */}
@@ -109,6 +138,13 @@ export function Navbar() {
                       >
                         <History size={15} /> Interview History
                       </Link>
+                      <Link
+                        href="/pricing"
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+                      >
+                        <Zap size={15} /> Buy Credits
+                      </Link>
                       <button
                         onClick={() => { setDropdownOpen(false); signOut({ callbackUrl: '/' }) }}
                         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose hover:bg-rose/10 transition-colors"
@@ -123,13 +159,23 @@ export function Navbar() {
           ) : (
             <>
               <Link
+                href="/pricing"
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors hidden sm:block ${
+                  pathname === '/pricing'
+                    ? 'bg-blue/10 text-blue'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                Pricing
+              </Link>
+              <Link
                 href="/login"
                 className="px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
               >
                 Sign In
               </Link>
               <Link
-                href="/login"
+                href="/signup"
                 className="px-4 py-2 rounded-lg text-sm font-semibold bg-blue text-white hover:bg-blue/90 transition-colors"
               >
                 Get Started

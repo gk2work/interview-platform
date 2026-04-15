@@ -23,6 +23,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
+    // Credit check — deduct 1 credit atomically; fails if credits < 1
+    const { User } = await import('@/models/User')
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: authSession.user.id, credits: { $gte: 1 } },
+      { $inc: { credits: -1 } },
+      { new: true }
+    )
+    if (!updatedUser) {
+      return NextResponse.json(
+        { error: 'NO_CREDITS', message: 'You have no interview credits remaining.' },
+        { status: 402 }
+      )
+    }
+
     const systemPrompt = buildSystemPrompt({
       _id: '',
       cvFileName: cvFilePath?.split('/').pop() || 'resume.pdf',

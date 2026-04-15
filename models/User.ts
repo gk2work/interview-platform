@@ -6,6 +6,7 @@ export interface UserDocument extends Document {
   image?: string
   googleId?: string
   password?: string
+  credits: number
   createdAt: Date
   updatedAt: Date
 }
@@ -17,6 +18,7 @@ const userSchema = new Schema<UserDocument>(
     image:    { type: String },
     googleId: { type: String, sparse: true, unique: true },
     password: { type: String },
+    credits:  { type: Number, default: 1, min: 0 },
   },
   { timestamps: true }
 )
