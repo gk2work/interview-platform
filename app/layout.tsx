@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { SessionProvider } from '@/components/layout/SessionProvider'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 export const metadata: Metadata = {
   title: 'FormalMock — AI Voice Interview Practice',
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="min-h-screen flex flex-col">
             <main className="flex-1">{children}</main>
           </div>
+          <SpeedInsights />
         </SessionProvider>
       </body>
     </html>
