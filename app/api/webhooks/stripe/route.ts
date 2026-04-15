@@ -3,7 +3,7 @@ import Stripe from 'stripe'
 import { connectDB } from '@/lib/mongodb'
 import { User } from '@/models/User'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-03-31.basil' })
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2026-02-25.clover' })
 
 // Next.js requires raw body for Stripe signature verification
 export const config = { api: { bodyParser: false } }
